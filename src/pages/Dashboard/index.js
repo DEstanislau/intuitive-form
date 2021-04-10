@@ -50,9 +50,7 @@ const Dashboard = () => {
       formRef.current.setErrors({});
 
       const schema = Yup.object().shape({
-        name: Yup.string()
-          .required('Nome obrigatório')
-          .min(8, 'mínimo de 8 letras.'),
+        name: Yup.string().required('Nome obrigatório'),
         email: Yup.string()
           .required('E-mail obrigatório')
           .email('Digite um e-mail válido'),
@@ -95,15 +93,21 @@ const Dashboard = () => {
 
         formRef.current.setErrors(errors);
         setLoading(false);
-      }
+      } else {
+        if (err.response.data) {
+          err.response.data.map(item =>
+            formRef.current.setFieldError(item.field, item.error)
+          );
+        }
 
+        setLoading(false);
+      }
       toast.error('Erro ao validar os dados, Tente Novamente.');
     }
   }, []);
 
   const getCepData = useCallback(async event => {
     const { value } = event.target;
-
     const formattedValue = value.replace(/[^0-9]/g, '');
 
     if (formattedValue.length !== 8) return;
